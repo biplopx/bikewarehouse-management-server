@@ -19,6 +19,7 @@ async function run() {
   try {
     await client.connect();
     const productsCollection = client.db('bikewarehouse').collection('productCollection');
+    // All Products API
     app.get('/products', async (req, res) => {
       const query = {};
       const cursor = productsCollection.find(query);
@@ -26,10 +27,16 @@ async function run() {
       res.send(products);
     });
 
+    // My items APi
+    app.get('/myitems/:email', async (req, res) => {
+      const query = { email: req.params.email };
+      const cursor = productsCollection.find(query);
+      const products = await cursor.toArray();
+      res.send(products);
+    });
 
 
-
-    // All Product API
+    // Product details api
     app.get('/inventory/:id', async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
@@ -45,7 +52,7 @@ async function run() {
       res.send(result);
     });
 
-    //
+    //update quantity api
     app.put('/inventory/quantityupdate/:id', async (req, res) => {
       const productId = req.params.id;
       const product = await productsCollection.findOne({ _id: ObjectId(productId) });
@@ -53,21 +60,26 @@ async function run() {
         { _id: ObjectId(productId) },
         { $set: { "quantity": (parseInt(product.quantity) + parseInt(req.body.newQuantity)) } }
       );
-      res.send(updateQuantity)
+      res.send(updateQuantity);
     });
-
+    // delivered udate api
     app.put('/inventory/delivered/:id', async (req, res) => {
       const productId = req.params.id;
       const product = await productsCollection.findOne({ _id: ObjectId(productId) });
       const deliveredQuantity = await productsCollection.updateOne(
         { _id: ObjectId(productId) },
         { $set: { "quantity": (parseInt(product.quantity) - 1), "sold": (parseInt(product.sold) + 1) } }
-
       );
       res.send(deliveredQuantity)
     });
 
-
+    // Delete API
+    app.delete('/inventory/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) }
+      const result = await productsCollection.deleteOne(query);
+      res.send(result)
+    })
 
   }
   finally {
