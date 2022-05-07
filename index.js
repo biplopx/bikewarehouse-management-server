@@ -26,12 +26,22 @@ async function run() {
       res.send(products);
     });
 
+    // All Product API
     app.get('/inventory/:id', async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
       const product = await productsCollection.findOne(query);
       res.send(product);
+    });
+
+    // Add Product API
+    app.post('/products', async (req, res) => {
+      const newProduct = req.body;
+      console.log(newProduct)
+      const result = await productsCollection.insertOne(newProduct);
+      res.send(result);
     })
+
   }
   finally {
     // finally
