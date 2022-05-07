@@ -26,6 +26,9 @@ async function run() {
       res.send(products);
     });
 
+
+
+
     // All Product API
     app.get('/inventory/:id', async (req, res) => {
       const id = req.params.id;
@@ -38,9 +41,33 @@ async function run() {
     app.post('/products', async (req, res) => {
       const newProduct = req.body;
       console.log(newProduct)
-      const result = await productsCollection.insertOne(newProduct);
+      const result = await productsCollection.insertOne({ ...newProduct, sold: 0 });
       res.send(result);
-    })
+    });
+
+    //
+    app.put('/inventory/quantityupdate/:id', async (req, res) => {
+      const productId = req.params.id;
+      const product = await productsCollection.findOne({ _id: ObjectId(productId) });
+      const updateQuantity = await productsCollection.updateOne(
+        { _id: ObjectId(productId) },
+        { $set: { "quantity": (parseInt(product.quantity) + parseInt(req.body.newQuantity)) } }
+      );
+      res.send(updateQuantity)
+    });
+
+    app.put('/inventory/delivered/:id', async (req, res) => {
+      const productId = req.params.id;
+      const product = await productsCollection.findOne({ _id: ObjectId(productId) });
+      const deliveredQuantity = await productsCollection.updateOne(
+        { _id: ObjectId(productId) },
+        { $set: { "quantity": (parseInt(product.quantity) - 1), "sold": (parseInt(product.sold) + 1) } }
+
+      );
+      res.send(deliveredQuantity)
+    });
+
+
 
   }
   finally {
