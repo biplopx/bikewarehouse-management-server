@@ -10,13 +10,13 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-
-
+// MongoDB Connect
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.ddxnu.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
 async function run() {
   try {
+
     await client.connect();
     const productsCollection = client.db('bikewarehouse').collection('productCollection');
     // All Products API
@@ -62,6 +62,7 @@ async function run() {
       );
       res.send(updateQuantity);
     });
+
     // delivered udate api
     app.put('/inventory/delivered/:id', async (req, res) => {
       const productId = req.params.id;
