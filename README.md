@@ -1,2 +1,3 @@
-# warehouse-management-server-side-biplopx
-warehouse-management-server-side-biplopx created by GitHub Classroom
+# BikeWarehouse -  Bikewarehouse - Modern Warehouse Management System (Server)
+
+Server URL: https://bikewarehouse-heroku.herokuapp.com/
